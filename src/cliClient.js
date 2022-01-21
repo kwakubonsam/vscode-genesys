@@ -1,12 +1,16 @@
+const {window} = require('vscode');
 const vscode = require('vscode');
 const childProcess = require('child_process');
 const fs = require('fs');
 
 class CliClient {
-  constructor(extensionContext, notificationTreeViewProvider) {
+  constructor(extensionContext, notificationsView, updateCLIProfileStatusBarItem) {
     this.cliPath = CliClient.detectInstallation();
     this.extensionContext = extensionContext;
-    this.notificationTreeViewProvider = notificationTreeViewProvider;
+    this.notificationsView = notificationsView;
+    this.updateCLIProfileStatusBarItem = updateCLIProfileStatusBarItem;
+    this.gcStream = null;
+    this.profileName = null;
     vscode.workspace.onDidChangeConfiguration(this._handleDidChangeConfiguration, this);
   }
 
@@ -15,6 +19,7 @@ class CliClient {
   }
 
   static async detectInstallation() {
+    // TODO more operating systems
     const installPath = '/usr/local/bin/gc';
 
     if (await isFile(installPath)) {
@@ -39,10 +44,36 @@ class CliClient {
     return cliPath;
   }
 
+  async selectCLIProfile() {
+    try {
+      let selectedProfile = await this._promptProfile();
+      if (!selectedProfile) {
+        return;
+      }
+      this.profileName = selectedProfile;
+      this.updateCLIProfileStatusBarItem(this.profileName);
+    } catch (e) {
+      window.showErrorMessage(`Cannot select CLI profile: ${e.message}`);
+    }
+  }
+
+  async _promptProfile() {
+    const profiles = await this.invoke(['profiles', 'list']);
+    let profileNames = [];
+    for (const profile of profiles)
+      profileNames.push(profile.profileName)
+    const selectedProfile = await window.showQuickPick(profileNames, {
+      matchOnDetail: true,
+      placeHolder: 'Select a profile',
+    });
+    return selectedProfile;
+  }
+
   async invoke(args, body) {
     if (body != null) {
       return await this._upsert(JSON.stringify(body), args);
     } else {
+      args = this._generateArgs(args)
       const child = childProcess.spawnSync('gc', args, { encoding : 'utf8' })
       return JSON.parse(child.stdout);
     }
@@ -51,7 +82,7 @@ class CliClient {
   _upsert(body, gcArgs) {
     return new Promise((resolve, reject) => {
       const echo = childProcess.spawn('echo', [body])
-      const gc = childProcess.spawn('gc', gcArgs)
+      const gc = childProcess.spawn('gc', this._generateArgs(gcArgs))
       echo.stdout.pipe(gc.stdin)
 
       let response = "";
@@ -69,11 +100,27 @@ class CliClient {
     });
   };
 
-  listenToWebsocket(channelId) {
-    const gc = childProcess.spawn('gc', ['notifications', 'channels', 'listen', channelId])
+  _generateArgs(args) {
+    if (this.profileName != null) {
+      args.push('--profile')
+      args.push(this.profileName)
+    }
+    return args;
+  }
 
-    gc.stdout.on("data", (chunk) => {
-      this.notificationTreeViewProvider.handleNotification(JSON.parse(chunk.toString()));
+  stopListeningToWebsocket() {
+    this.gcStream.kill();
+  }
+
+  listenToWebsocket(channelId, showHeartbeat) {
+    let args = ['notifications', 'channels', 'listen', channelId];
+    if (!showHeartbeat)
+      args.push('--noheartbeat')
+    args = this._generateArgs(args)
+    this.gcStream = childProcess.spawn('gc', args)
+
+    this.gcStream.stdout.on("data", (chunk) => {
+      this.notificationsView.handleItem(JSON.parse(chunk.toString()));
     });
   }
 

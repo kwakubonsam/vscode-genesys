@@ -2,7 +2,7 @@ const {GenesysCloudTreeItem} = require('./genesysCloudTreeItem');
 const {TreeViewDataProvider} = require('./treeViewDataProvider');
 const {ThemeIcon} = require('vscode');
 
-class TutorialsViewProvider extends TreeViewDataProvider {
+class TutorialsView extends TreeViewDataProvider {
 
   buildTree() {
     const items = [];
@@ -20,4 +20,4 @@ class TutorialsViewProvider extends TreeViewDataProvider {
   }
 }
 
-module.exports.TutorialsViewProvider = TutorialsViewProvider
+module.exports.TutorialsView = TutorialsView
