@@ -1,111 +1,122 @@
 {
-	"name": "genesys-cloud",
-	"displayName": "Genesys Cloud",
-	"description": "Genesys Cloud VSCode Extension",
-	"version": "0.0.1",
-	"engines": {
-		"vscode": "^1.63.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onCommand:genesys-cloud.openTutorial",
-		"onCommand:genesys-cloud.checkCLI",
-		"onCommand:genesys-cloud.openNotificationDetails",
-		"onCommand:genesys-cloud.startNotificationStreaming",
-		"onView:tutorialsView",
-		"onView:notificationsView"
-	],
-	"main": "./src/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"category": "Genesys Cloud",
-				"command": "genesys-cloud.openTutorial",
-				"title": "Open Tutorial"
-			},
-			{
-				"category": "Genesys Cloud",
-				"command": "genesys-cloud.checkCLI",
-				"title": "Check CLI"
-			},
-			{
-				"category": "Genesys Cloud",
-				"command": "genesys-cloud.openNotificationDetails",
-				"title": "Open the notification in a text editor"
-			},
-			{
-				"category": "Genesys Cloud",
-				"command": "genesys-cloud.startNotificationStreaming",
-				"title": "Start streaming notifications"
-			}
-		],
-		"views": {
-			"genesys-cloud": [
-				{
-					"id": "notificationsView",
-					"name": "Notifications",
-					"when": "genesys-cloud.isNotCLIInstalled == false"
-				},
-				{
-					"id": "installCLIView",
-					"name": "Install GC CLI",
-					"when": "genesys-cloud.isNotCLIInstalled == true"
-				},
-				{
-					"id": "tutorialsView",
-					"name": "Tutorials"
-				}
-			]
-		},
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"icon": "resources/icons/genesys-cloud-logo.svg",
-					"id": "genesys-cloud",
-					"title": "Genesys Cloud"
-				}
-			]
-		},
-		"viewsWelcome": [
-			{
-				"view": "installCLIView",
-				"contents": "Welcome! The Genesys Cloud VS Code extension requires the GC CLI.\n[Install GC CLI](https://developer.genesys.cloud/api/rest/command-line-interface/)"
-			}
-		],
-		"menus": {
-			"view/item/context": [
-			  {
-				"command": "genesys-cloud.openTutorial",
-				"when": "viewItem == tutorialsItem"
-			  },
-			  {
-				"command": "genesys-cloud.openTutorial",
-				"when": "viewItem == tutorialsItem"
-			  }
-			]
-		}
-	},
-	"scripts": {
-		"lint": "eslint .",
-		"pretest": "npm run lint",
-		"test": "node ./test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/vscode": "^1.63.0",
-		"@types/glob": "^7.2.0",
-		"@types/mocha": "^9.0.0",
-		"@types/node": "14.x",
-		"eslint": "^8.6.0",
-		"glob": "^7.2.0",
-		"mocha": "^9.1.3",
-		"typescript": "^4.5.4",
-		"@vscode/test-electron": "^2.0.3"
-	},
-	"dependencies": {
-		"@octokit/rest": "^18.12.0",
-		"github-api": "^3.4.0",
-		"octokit": "^1.7.1"
-	}
+  "name": "genesys-cloud",
+  "displayName": "Genesys Cloud",
+  "description": "Genesys Cloud VSCode Extension",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.63.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:genesys-cloud.openTutorial",
+    "onCommand:genesys-cloud.checkCLI",
+    "onCommand:genesys-cloud.openNotificationDetails",
+    "onCommand:genesys-cloud.startNotificationStreaming",
+    "onCommand:genesys-cloud.openLinks",
+    "onView:tutorialsView",
+    "onView:notificationsView",
+    "onview:resourcesView"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.openTutorial",
+        "title": "Open Tutorial"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.checkCLI",
+        "title": "Check CLI"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.openNotificationDetails",
+        "title": "Open the notification in a text editor"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.startNotificationStreaming",
+        "title": "Start streaming notifications"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.openLinks",
+        "title": "Helpful Links"
+      }
+    ],
+    "views": {
+      "genesys-cloud": [
+        {
+          "id": "notificationsView",
+          "name": "Notifications",
+          "when": "genesys-cloud.isNotCLIInstalled == false"
+        },
+        {
+          "id": "installCLIView",
+          "name": "Install GC CLI",
+          "when": "genesys-cloud.isNotCLIInstalled == true"
+        },
+        {
+          "id": "tutorialsView",
+          "name": "Tutorials"
+        },
+        {
+          "id": "helpfulLinks",
+          "name": "Helpful Links"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "icon": "resources/icons/genesys-cloud-logo.svg",
+          "id": "genesys-cloud",
+          "title": "Genesys Cloud"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "installCLIView",
+        "contents": "Welcome! The Genesys Cloud VS Code extension requires the GC CLI.\n[Install GC CLI](https://developer.genesys.cloud/api/rest/command-line-interface/)"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "genesys-cloud.openTutorial",
+          "when": "viewItem == tutorialsItem"
+        },
+        {
+          "command": "genesys-cloud.openTutorial",
+          "when": "viewItem == tutorialsItem"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.63.0",
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "14.x",
+    "eslint": "^8.6.0",
+    "glob": "^7.2.0",
+    "mocha": "^9.1.3",
+    "typescript": "^4.5.4",
+    "@vscode/test-electron": "^2.0.3"
+  },
+  "dependencies": {
+    "@octokit/rest": "^18.12.0",
+    "github-api": "^3.4.0",
+    "octokit": "^1.7.1"
+  }
 }
