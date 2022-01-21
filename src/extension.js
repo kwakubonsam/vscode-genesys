@@ -5,6 +5,7 @@ const vscode = require("vscode");
 const { Tutorials } = require("./tutorials");
 const { CliClient } = require("./cliClient");
 const { HelpfulLinks } = require("./helpfulLinks.js");
+const { CreateCliProfile } = require("./createCliProfile");
 const {
   initializeWorkspaceState,
   getNotificationDetailsMap,
@@ -28,6 +29,8 @@ function activate(context) {
   const tutorials = new Tutorials();
 
   const links = new HelpfulLinks();
+
+  const createCliProfile = new CreateCliProfile();
 
   function openNotificationDetails(data) {
     const filename = data.id;
@@ -72,13 +75,13 @@ function activate(context) {
     showCollapseAll: false,
   });
 
-  vscode.window.createTreeView("tutorialsView", {
-    treeDataProvider: new TutorialsViewProvider(),
+  vscode.window.createTreeView("helpfulLinksView", {
+    treeDataProvider: new ResourcesLinkView(),
     showCollapseAll: false,
   });
 
-  vscode.window.createTreeView("helpfulLinks", {
-    treeDataProvider: new ResourcesLinkView(),
+  vscode.window.createTreeView("tutorialsView", {
+    treeDataProvider: new TutorialsViewProvider(),
     showCollapseAll: false,
   });
 
@@ -97,6 +100,14 @@ function activate(context) {
         return notifications.selectAndConnectToTopic();
       }
     ),
+
+    vscode.commands.registerCommand(
+      "genesys-cloud.createCliProfile",
+      function () {
+        return createCliProfile.createProfile();
+      }
+    ),
+
     vscode.commands.registerCommand(
       "genesys-cloud.openNotificationDetails",
       function (data) {

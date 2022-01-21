@@ -15,9 +15,10 @@
     "onCommand:genesys-cloud.openNotificationDetails",
     "onCommand:genesys-cloud.startNotificationStreaming",
     "onCommand:genesys-cloud.openLinks",
+    "onCommand:genesys-cloud.createCliProfile",
     "onView:tutorialsView",
     "onView:notificationsView",
-    "onview:resourcesView"
+    "onview:helpfulLinksView"
   ],
   "main": "./src/extension.js",
   "contributes": {
@@ -46,6 +47,11 @@
         "category": "Genesys Cloud",
         "command": "genesys-cloud.openLinks",
         "title": "Helpful Links"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.createCliProfile",
+        "title": "Create a new CLI profile"
       }
     ],
     "views": {
@@ -65,7 +71,7 @@
           "name": "Tutorials"
         },
         {
-          "id": "helpfulLinks",
+          "id": "helpfulLinksView",
           "name": "Helpful Links"
         }
       ]
@@ -94,6 +100,10 @@
         {
           "command": "genesys-cloud.openTutorial",
           "when": "viewItem == tutorialsItem"
+        },
+        {
+          "command": "genesys-cloud.openLinks",
+          "when": "viewItem == resourceItem"
         }
       ]
     }
