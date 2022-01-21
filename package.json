@@ -10,15 +10,22 @@
     "Other"
   ],
   "activationEvents": [
+    "onStartupFinished",
     "onCommand:genesys-cloud.openTutorial",
     "onCommand:genesys-cloud.checkCLI",
-    "onCommand:genesys-cloud.openNotificationDetails",
+    "onCommand:genesys-cloud.selectCLIProfile",
+    "onCommand:createCliProfile",
     "onCommand:genesys-cloud.startNotificationStreaming",
+    "onCommand:genesys-cloud.stopNotificationStreaming",
+    "onCommand:genesys-cloud.openNotificationDetails",
+    "onCommand:genesys-cloud.startSDKLogStreaming",
+    "onCommand:genesys-cloud.stopSDKLogStreaming",
+    "onCommand:genesys-cloud.openSDKLogDetails",
     "onCommand:genesys-cloud.openLinks",
-    "onCommand:genesys-cloud.createCliProfile",
+    "onview:helpfulLinksView",
     "onView:tutorialsView",
     "onView:notificationsView",
-    "onview:helpfulLinksView"
+    "onView:sdkLogsView"
   ],
   "main": "./src/extension.js",
   "contributes": {
@@ -35,13 +42,28 @@
       },
       {
         "category": "Genesys Cloud",
-        "command": "genesys-cloud.openNotificationDetails",
-        "title": "Open the notification in a text editor"
+        "command": "genesys-cloud.selectCLIProfile",
+        "title": "Select CLI profile"
       },
       {
         "category": "Genesys Cloud",
         "command": "genesys-cloud.startNotificationStreaming",
         "title": "Start streaming notifications"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.stopNotificationStreaming",
+        "title": "Stop streaming notifications"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.startSDKLogStreaming",
+        "title": "Start streaming SDK logs"
+      },
+      {
+        "category": "Genesys Cloud",
+        "command": "genesys-cloud.stopSDKLogStreaming",
+        "title": "Stop streaming SDK logs"
       },
       {
         "category": "Genesys Cloud",
@@ -60,6 +82,10 @@
           "id": "notificationsView",
           "name": "Notifications",
           "when": "genesys-cloud.isNotCLIInstalled == false"
+        },
+        {
+          "id": "sdkLogsView",
+          "name": "SDK Logs"
         },
         {
           "id": "installCLIView",
@@ -100,10 +126,6 @@
         {
           "command": "genesys-cloud.openTutorial",
           "when": "viewItem == tutorialsItem"
-        },
-        {
-          "command": "genesys-cloud.openLinks",
-          "when": "viewItem == resourceItem"
         }
       ]
     }
@@ -126,6 +148,7 @@
   },
   "dependencies": {
     "@octokit/rest": "^18.12.0",
+    "always-tail": "^0.2.0",
     "github-api": "^3.4.0",
     "octokit": "^1.7.1"
   }

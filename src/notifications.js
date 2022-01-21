@@ -1,52 +1,57 @@
-const {ProgressLocation, window, workspace} = require('vscode');
-const path = require('path')
+const {window} = require('vscode');
+const {Idle, Loading, Streaming} = require('./views/streamingViewDataProvider')
 
 class Notifications {
-  constructor(cliClient) {
+  constructor(cliClient, notificationsView) {
     this.cliClient = cliClient;
+    this.notificationsView = notificationsView;
   }
 
   async selectAndConnectToTopic() {
     try {
+      this.notificationsView.clearItems();
+      this.notificationsView.setViewState(Loading);
       let selectedTopic = await this._promptTopic();
       if (!selectedTopic) {
+        this.notificationsView.setViewState(Idle);
         return;
       }
 
       if (selectedTopic.includes('{id}')) {
-        const id = await this._promptId();
-        selectedTopic = selectedTopic.replace('{id}', id)
+        const selectedId = await this._promptId();
+        if (!selectedId) {
+          this.notificationsView.setViewState(Idle);
+          return;
+        }
+        selectedTopic = selectedTopic.replace('{id}', selectedId)
       }
-      
-      this._streamNotifications(selectedTopic)
+
+      const showHeartBeat = await this._promptHeartbeat()
+
+      this.notificationsView.setViewState(Streaming);
+      this._streamNotifications(selectedTopic, showHeartBeat)
     } catch (e) {
       window.showErrorMessage(`Cannot subscribe to topic: ${e.message}`);
     }
   };
 
-  async _streamNotifications(topic) {
+  async stopNotificationStreaming() {
+    this.notificationsView.setViewState(Idle);
+    this.cliClient.stopListeningToWebsocket();
+  }
+
+  async _streamNotifications(topic, showHeartbeat) {
     const result = await this.cliClient.invoke(['notifications', 'channels', 'create'])
     let channelId = result.id
     await this.cliClient.invoke(['notifications', 'channels', 'subscriptions', 'subscribe', channelId], [{
       id: topic
     }])
 
-    this.cliClient.listenToWebsocket(channelId)
+    this.cliClient.listenToWebsocket(channelId, showHeartbeat)
   }
 
   async _promptTopic() {
-    let result = {}
-    await window.withProgress(
-      {
-        location: ProgressLocation.Notification,
-        title: `Fetching available topics`,
-        cancellable: false,
-      },
-      async (progress, token) => {
-        result = await this.cliClient.invoke(['notifications', 'availabletopics', 'list'])
-      }
-    )
-
+    let result = await this.cliClient.invoke(['notifications', 'availabletopics', 'list'])
     let availableTopics = [];
     for (const entity of result.entities)
       availableTopics.push(entity.id)
@@ -64,6 +69,14 @@ class Notifications {
     });
     return selectedLanguage;
   };
+
+  async _promptHeartbeat() {
+    const answer = await window.showQuickPick(["Yes", "No"], {
+      matchOnDetail: true,
+      placeHolder: 'Show heartbeat message?',
+    });
+    return answer === "Yes";
+  }
 }
 
 module.exports.Notifications = Notifications
