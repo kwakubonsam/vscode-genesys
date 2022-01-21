@@ -4,7 +4,7 @@ class GenesysCloudTreeItem extends TreeItem {
   constructor(label, options) {
     super(label, TreeItemCollapsibleState.None);
     this.children = [];
-    this.parent = null;//new GenesysCloudTreeItem();
+    this.parent = null;
     this.label = label;
     this.contextValue = options && options.contextValue || 'genesys-cloud';
     this.commandString = options && options.commandString;

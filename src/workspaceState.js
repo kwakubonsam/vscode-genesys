@@ -1,5 +1,6 @@
 // Used to keep track of notification details for notification tree items while notification streaming is active.
 const notificationDetailsKey = 'NotificationDetails';
+const sdkLogDetailsKey = 'SDKLogDetails';
 
 function initializeWorkspaceState(extensionContext) {
   clearNotificationDetails(extensionContext);
@@ -19,10 +20,28 @@ function clearNotificationDetails(extensionContext) {
   extensionContext.workspaceState.update(notificationDetailsKey, new Map());
 }
 
+function getSDKLogDetailsMap(extensionContext) {
+  return extensionContext.workspaceState.get(sdkLogDetailsKey, new Map());
+}
+
+function addSDKLogDetails(extensionContext, sdkLogId, sdkLogObject) {
+  const sdkLogDetailsMap = getSDKLogDetailsMap(extensionContext);
+  sdkLogDetailsMap.set(sdkLogId, sdkLogObject);
+  extensionContext.workspaceState.update(sdkLogDetailsKey, sdkLogDetailsMap);
+}
+
+function clearSDKLogDetails(extensionContext) {
+  extensionContext.workspaceState.update(sdkLogDetailsKey, new Map());
+}
+
 module.exports = {
-    notificationDetailsKey: notificationDetailsKey,
-    initializeWorkspaceState: initializeWorkspaceState,
-    addNotificationDetails: addNotificationDetails,
-    getNotificationDetailsMap: getNotificationDetailsMap,
-    clearNotificationDetails: clearNotificationDetails
+    notificationDetailsKey,
+    sdkLogDetailsKey,
+    initializeWorkspaceState,
+    addNotificationDetails,
+    getNotificationDetailsMap,
+    clearNotificationDetails,
+    addSDKLogDetails,
+    getSDKLogDetailsMap,
+    clearSDKLogDetails
 }

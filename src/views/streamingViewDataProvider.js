@@ -1,5 +1,6 @@
 const path = require('path');
-const {ThemeIcon, window} = require('vscode');
+const {EventEmitter} = require('vscode');
+const {ThemeIcon} = require('vscode');
 const {GenesysCloudTreeItem} = require('./genesysCloudTreeItem');
 const {TreeViewDataProvider} = require('./treeViewDataProvider');
 
@@ -8,35 +9,21 @@ const Loading = 1;
 const Streaming = 2;
 
 class StreamingViewDataProvider extends TreeViewDataProvider {
-  constructor(cliClient) {
-    super();
-    this.cliClient = cliClient;
+  constructor(context) {
+    super()
+    this.context = context;
+    this._onDidChangeTreeData = new EventEmitter();
+    this.onDidChangeTreeData = this._onDidChangeTreeData.event;
     this.streamingTreeItems = [];
     this.viewState = Idle;
-
-    this.readableStream = {};
   }
 
-  startStreaming = async () => {
-    if (this.viewState === Idle) {
-      this.setViewState(Loading);
-      try {
-        await this.setupStreams();
-      } catch (e) {
-        window.showErrorMessage(e.message);
-        this.stopStreaming();
-      }
-    }
-  };
-
-  stopStreaming = () => {
-    this.cleanupStreams();
-    this.setViewState(Idle);
-  };
-
   clearItems() {
-    this.streamingTreeItems = [];
-    this.refresh();
+    throw new Error('clearItems not implemented')
+  }
+
+  handleItem() {
+    throw new Error('handleItem not implemented')
   }
 
   getStreamingControlItem(
@@ -74,8 +61,8 @@ class StreamingViewDataProvider extends TreeViewDataProvider {
       return new GenesysCloudTreeItem(command.label, {
         commandString: command.command,
         iconPath: {
-          light: path.resolve(__dirname, `../resources/icons/light/${command.iconFileName}.svg`),
-          dark: path.resolve(__dirname, `../resources/icons/dark/${command.iconFileName}.svg`),
+          light: path.resolve(__dirname, `../../resources/icons/light/${command.iconFileName}.svg`),
+          dark: path.resolve(__dirname, `../../resources/icons/dark/${command.iconFileName}.svg`),
         },
       });
     } else {
@@ -86,27 +73,26 @@ class StreamingViewDataProvider extends TreeViewDataProvider {
     }
   }
 
-async setupStreams() {
-  }
-
-  createReadableStream(){}
-
-  handleData(){};
-
-  insertItem = (treeItem) => {
-    this.streamingTreeItems.unshift(treeItem);
-  };
-
   setViewState(viewState) {
     this.viewState = viewState;
     this.refresh();
   }
 
-  cleanupStreams = () => {
-    this.readableStream.cancel();
-    this.readableStream.destroy();
-    this.readableStream = undefined;
-  };
+  refresh() {
+    this.treeItems = null;
+    this._onDidChangeTreeData.fire(null);
+  }
+
+  getTreeItem(element) {
+    return element;
+  }
+
+  async getChildren(element) {
+    if (element === undefined) {
+      return await this.buildTree();
+    }
+    return element.children;
+  }
 }
 
 module.exports = {
